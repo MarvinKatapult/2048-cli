@@ -1,5 +1,3 @@
-# WORK IN PROGRESS
-
 # The Idea
 2048 in the terminal.
 
