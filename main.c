@@ -1,16 +1,18 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include <cterm.h>
 
 #define BOARD_GEOMETRY  4
 
 static unsigned long board[BOARD_GEOMETRY][BOARD_GEOMETRY] = { 
-    { 0, 16, 16, 0 },
+    { 0, 0, 0, 0 },
     { 0, 2, 2, 0 },
-    { 2, 0, 4, 0 },
-    { 2, 0, 0, 12 }
+    { 0, 0, 0, 0 },
+    { 0, 0, 0, 0 }
 };
 
 CT_Color getColForNum(int num) {
@@ -116,12 +118,30 @@ void move(int x, int y) {
     if (changed) move(x, y);
 }
 
-void spawnNewVals() {
-    // TODO
+bool spawnNewVals() {
+	unsigned long * zeroes[16] = {};
+	int count = 0;
+	for (int i = 0; i < BOARD_GEOMETRY; i++) {
+		for (int j = 0; j < BOARD_GEOMETRY; j++) {
+			unsigned long val = board[i][j];
+			if (val == 0) {
+				zeroes[count++] = &board[i][j];
+			}
+		}
+	}
+
+	if (count == 0) {
+		return false;
+	}
+
+	int new_loc = rand() % count;
+	*zeroes[new_loc] = 2;
+	return true;
 }
 
 int main() {
 
+	srand(time(NULL));
     enableRawMode();
 
     while (1) {
@@ -134,7 +154,11 @@ int main() {
             int x, y;
             getDirForInp(inp, &x, &y);
             move(x, y);
-            spawnNewVals();
+            if (!spawnNewVals()) {
+				printf("You lost!\n");
+				disableRawMode();
+				exit(EXIT_SUCCESS);
+			}
         }
     }
 
